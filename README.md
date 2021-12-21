@@ -1,11 +1,12 @@
 # NotionRenderer
 
-**TODO: Add description**
+**This project's author has no affiliation with Notion**
+
+Want to render notion API blocks into HTML? This library is for you.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `notion_renderer` to your list of dependencies in `mix.exs`:
+This package can be installed by adding `notion_renderer` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -15,9 +16,38 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/notion_renderer](https://hexdocs.pm/notion_renderer).
+## TODO
+
+- [ ] Better testing strategy and exhaustive testing
+- [ ] Hex documentation (currently documentation is in this file)
+
+## Usage
+
+Retrieving blocks via the API is not something this library handles. You need to do that and then provide blocks
+to `NotionRenderer.block_to_html/1,2`. In order to render child content, you also need to provide the `_children`
+attribute which is a list of blocks. Basically, you can recursively hit the API to build up the blocks list.
+
+Blocks are expected to be a string-based map. The blocks are taken as-is from the API, with the
+added support of `_children`.
+
+```elixir
+# Retrieving blocks is up to you
+blocks = retrieve_blocks_from_api()
+
+# Then just pass them in!
+html = NotionRenderer.block_to_html(blocks)
+
+# or pass options
+rewriter = fn href -> "modified #{href}" end
+html = NotionRenderer.block_to_html(blocks, [link_rewriter: rewriter])
+```
+
+## Options
+
+You can provide `link_rewriter` option to rewrite all link hrefs. This option is useful to rewrite page links
+into your platform's patterns.
+
+All of the HTML renderers are replaceable via the `config` property. It's undocumented at this time.
 
 ## Dimensions
 
@@ -48,9 +78,12 @@ Some types are supported but have caveats:
 * video (is implemented with a few common video providers embed code, but might be missing some. See `Html.VideoEmbed` for the list)
 * toggle (is implemented, but is just a <ul>)
 * equation (is implemented, but you must use KaTeX to format it in JS)
-* synced_block (is implemented, but only if you provide the _children property)
+* synced_block (is implemented, but only if you provide the `_children` property)
 
 ## CSS
+
+Rather than inlining styles, this code tries to use CSS classes whenever reasonable. You can overwrite these classes
+as needed, but the following stylesheet is a great start.
 
 ```
 <style>
@@ -66,6 +99,10 @@ Some types are supported but have caveats:
 
   .notion-callout-content {
     flex-grow: 1;
+  }
+
+  .notion-video {
+    margin: 0;
   }
 
   .notion-embed,
