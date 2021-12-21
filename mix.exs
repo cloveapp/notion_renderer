@@ -7,7 +7,14 @@ defmodule NotionRenderer.MixProject do
       version: "0.1.0",
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      description: "Render Notion.so public API blocks into HTML",
+      package: %{
+        licenses: ["MIT AND Apache-2.0"],
+        links: %{
+          github: "https://github.com/cloveapp/notion_renderer"
+        }
+      }
     ]
   end
 
